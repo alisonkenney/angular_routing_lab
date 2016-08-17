@@ -1,4 +1,4 @@
-var app = angular.module('wineApp', ['ngRoute']);
+var app = angular.module('wineApp', ['ngRoute', 'ngResource']);
 
 console.log('Angular is working.');
 
@@ -29,25 +29,30 @@ console.log('Angular is working.');
 // CONTROLLERS //
 /////////////////
 
-WinesIndexCtrl.$inject = ['$scope', '$http'];
+WinesIndexCtrl.$inject = ['$scope', 'Wines'];
 app.controller('WinesIndexCtrl', WinesIndexCtrl);
-function WinesIndexCtrl($scope, $http){
-    this.$inject = ['http'];
-     $http.get('http://daretoexplore.herokuapp.com/wines/')
-     .then(function(response) {
-          $scope.wines = response.data;         
-     });  
+function WinesIndexCtrl($scope, Wines){
+    // this.$inject = ['http'];
+    //  $http.get('http://daretoexplore.herokuapp.com/wines/')
+    //  .then(function(response) {
+    //       $scope.wines = response.data;
+    $scope.wines = Wines.query();           
 }
 
-WinesShowCtrl.$inject = ['$scope', '$http', '$routeParams'];
+WinesShowCtrl.$inject = ['$scope', 'Wines', '$routeParams'];
 app.controller('WinesShowCtrl', WinesShowCtrl);
-function WinesShowCtrl($scope, $http, $routeParams){
-     $http.get('http://daretoexplore.herokuapp.com/wines/' + $routeParams.id)
-     .then(function(response) {
-          $scope.wine = response.data;         
-     });  
-}      
+function WinesShowCtrl($scope, Wines, $routeParams){
+     // $http.get('http://daretoexplore.herokuapp.com/wines/' + $routeParams.id)
+     // .then(function(response) {
+     //      $scope.wine = response.data;         
+    $scope.wine = Wines.get({id: $routeParams.id});
+} 
 
+app.factory("Wines", Wines);
+Wines.$inject = ['$resource'];
+function Wines($resource) {
+    return $resource("http://daretoexplore.herokuapp.com/wines/:id");
+  }
 
 // WinesIndexCtrl.$inject = ['$scope', 'WineService'];
 // app.controller('WinesIndexCtrl', WinesIndexCtrl);
